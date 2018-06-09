@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{a3501858-23e2-463c-9c78-45619a43b3fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GamePlay">
+      <UniqueIdentifier>{f1acdfe3-66ea-4d54-b416-0626ef48d35e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network">
+      <UniqueIdentifier>{f8911160-09c4-40e8-8e86-7073ae1a5627}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{5e25e26f-cf8f-4007-88b4-91851e16bdb3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Src\ClientProxy.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\NetworkManagerServer.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\ReplicationManagerServer.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\ReplicationManagerTransmissionData.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Server.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\ServerMain.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\BulletServer.cpp">
+      <Filter>GamePlay</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\TankServer.cpp">
+      <Filter>GamePlay</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\BrickServer.cpp">
+      <Filter>GamePlay</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Inc\ClientProxy.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Server.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\NetworkManagerServer.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ReplicationManagerServer.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ReplicationManagerTransmissionData.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\BulletServer.h">
+      <Filter>GamePlay</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\TankServer.h">
+      <Filter>GamePlay</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\BrickServer.h">
+      <Filter>GamePlay</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\TankServerPCH.h" />
+  </ItemGroup>
+</Project>

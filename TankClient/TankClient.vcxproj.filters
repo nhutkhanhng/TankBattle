@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{25081b57-0e8d-405b-8dd7-fc85e949e8db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GamePlay">
+      <UniqueIdentifier>{d5f93c4e-adbe-4db2-a948-c6f64156493b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Server">
+      <UniqueIdentifier>{9a5c29f4-5922-43bf-af0e-2c6180a1fc98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Adapter">
+      <UniqueIdentifier>{78de2ab0-1328-4b65-954d-ca4512f95d97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{deb5f856-7eb9-4d1a-b1ec-3b1246dd0311}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SDL">
+      <UniqueIdentifier>{dd08b787-37ed-48fa-ba7c-4e29716d7e13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{6531b2f1-c164-4873-bd1b-249b211b564a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Src\Client.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\ClientMain.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\GraphicsDriver.cpp">
+      <Filter>SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\HUD.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\InputManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\NetworkManagerClient.cpp">
+      <Filter>Server</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\RenderManager.cpp">
+      <Filter>SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\ReplicationManagerClient.cpp">
+      <Filter>Server</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\SpriteComponent.cpp">
+      <Filter>SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Texture.cpp">
+      <Filter>SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\WindowManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\TextureManager.cpp">
+      <Filter>SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\BulletClient.cpp">
+      <Filter>GamePlay</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\TankClient.cpp">
+      <Filter>GamePlay</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\BrickClient.cpp">
+      <Filter>GamePlay</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Inc\HUD.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\WindowManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Texture.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\TextureManager.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\RenderManager.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\InputManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\GraphicsDriver.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Client.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\SpriteComponent.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\NetworkManagerClient.h">
+      <Filter>Server</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ReplicationManagerClient.h">
+      <Filter>Server</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\BulletClient.h">
+      <Filter>GamePlay</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\TankClient.h">
+      <Filter>GamePlay</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\BrickClient.h">
+      <Filter>GamePlay</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\TankClientPCH.h" />
+  </ItemGroup>
+</Project>
