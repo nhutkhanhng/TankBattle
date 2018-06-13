@@ -24,6 +24,13 @@
 	const int SOCKET_ERROR = -1;
 #endif
 
+
+#include <stdio.h>
+#include <io.h>
+#include <fcntl.h>
+#include <windows.h>
+#include <iostream>
+
 #include "memory"
 
 #include "vector"

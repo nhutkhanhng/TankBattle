@@ -6,7 +6,7 @@ SpriteComponent::SpriteComponent( GameObject *inGameObject ) :
 	//hardcoded at the moment...
 	float textureWidth = 128.f, textureHeight = 128.f;
 	//origin should be half texture size, but we're not loading the actual size at the moment
-	mOrigin = Vector3( textureWidth * 0.5f, textureHeight * 0.5f, 0.f );
+	mOrigin = Vector3( textureWidth * 0.5f * 0.f, textureHeight * 0.5f * 0.f, 0.f );
 
 	//and add yourself to the rendermanager...
 	RenderManager::sInstance->AddComponent( this );
@@ -32,12 +32,15 @@ void SpriteComponent::Draw( const SDL_Rect& inViewTransform )
 
 		// Compute the destination rectangle
 		Vector3 objLocation = mGameObject->GetLocation();
+
 		float objScale = mGameObject->GetScale();
 		SDL_Rect dstRect;
 		dstRect.w = static_cast< int >( mTexture->GetWidth() * objScale );
 		dstRect.h = static_cast< int >( mTexture->GetHeight() * objScale );
-		dstRect.x = static_cast<int>( objLocation.mX * inViewTransform.w + inViewTransform.x - dstRect.w / 2 );
-		dstRect.y = static_cast<int>( objLocation.mY * inViewTransform.h + inViewTransform.y - dstRect.h / 2 );
+
+		// Set Center6
+		dstRect.x = static_cast<int>( objLocation.mX * inViewTransform.w + inViewTransform.x /*- dstRect.w / 2*/ );
+		dstRect.y = static_cast<int>( objLocation.mY * inViewTransform.h + inViewTransform.y /*- dstRect.h / 2*/ );
 		
 		// Blit the texture
 		SDL_RenderCopyEx( GraphicsDriver::sInstance->GetRenderer(), mTexture->GetData(), nullptr,

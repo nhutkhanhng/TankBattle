@@ -41,6 +41,7 @@ void ReplicationManagerClient::ReadAndDoCreateAction( InputMemoryBitStream& inIn
 	{
 		//create the object and map it...
 		gameObject = GameObjectRegistry::sInstance->CreateGameObject( fourCCName );
+		std::cout << "\nPosition of Texture Component in Client Side " << (*gameObject).GetLocation().mX << (*gameObject).GetLocation().mY << (*gameObject).GetClassId();
 		gameObject->SetNetworkId( inNetworkId );
 		NetworkManagerClient::sInstance->AddToNetworkIdToGameObjectMap( gameObject );
 		
