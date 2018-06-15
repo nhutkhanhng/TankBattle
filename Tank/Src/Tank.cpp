@@ -1,8 +1,8 @@
 #include <TankPCH.h>
 
 //zoom hardcoded at 100...if we want to lock players on screen, this could be calculated from zoom
-const float HALF_WORLD_HEIGHT = 7.2f;
-const float HALF_WORLD_WIDTH = 12.8f;
+const float HALF_WORLD_HEIGHT = 3.6f;
+const float HALF_WORLD_WIDTH = 6.4f;
 
 Tank::Tank() :
 	GameObject(),
@@ -88,7 +88,7 @@ void Tank::Update()
 }
 
 namespace {
-	bool CollideBox(const GameObject& A	, const GameObject& B)
+	bool CollideBox(const GameObject& A, const GameObject& B)
 	{
 		if ((A.GetLocation().mX + A.GetCollisionRadius() >= B.GetLocation().mX - B.GetCollisionRadius()) &&
 			(A.GetLocation().mX - A.GetCollisionRadius() <= B.GetLocation().mX + B.GetCollisionRadius()) &&
@@ -99,6 +99,13 @@ namespace {
 			// set collision vector
 			return true;
 		}
+
+		return false;
+	}
+
+
+	bool CollideAABB(GameObject &A, const GameObject &B)
+	{
 
 		return false;
 	}
@@ -158,49 +165,64 @@ void Tank::ProcessCollisions()
 
 					Vector3 acceptableDeltaFromSourceToTarget;
 
-					if (GetForwardVector().Length > 0)
+				/*	if (GetForwardVector().Length() > 0)
 						acceptableDeltaFromSourceToTarget = dirToTarget * collisionDist * GetForwardVector() * GetForwardVector();
 					else
-						acceptableDeltaFromSourceToTarget = dirToTarget * collisionDist;
+						acceptableDeltaFromSourceToTarget = dirToTarget * collisionDist;*/
+
+					acceptableDeltaFromSourceToTarget = dirToTarget * collisionDist;
+
 					std::cout << "\nDirToTarget" << acceptableDeltaFromSourceToTarget;
 
-					SetLocation(targetLocation - acceptableDeltaFromSourceToTarget/* - sourceLocation*/);
+					/*acceptableDeltaFromSourceToTarget = acceptableDeltaFromSourceToTarget*  GetForwardVector();*/
+
+					std::cout << "\nAccetable " << acceptableDeltaFromSourceToTarget;
+
+
+					//SetLocation(targetLocation - acceptableDeltaFromSourceToTarget/* - sourceLocation*/);
+					/*SetLocation(sourceLocation - acceptableDeltaFromSourceToTarget);*/
+					if (this->GetVelocity().mY == 0.f)
+					{
+						acceptableDeltaFromSourceToTarget.mY = 0.f;
+					}
+					else
+						acceptableDeltaFromSourceToTarget.mX = 0.f;
+
+					float CUV = Dot2D(sourceLocation, targetLocation);
+
+					std::cout << " Position " << GetLocation();
+					SetLocation(sourceLocation - acceptableDeltaFromSourceToTarget * ( 0.1f )/** (collisionDist * distSq)*/ /* - sourceLocation*/);
+					std::cout << " Position " << GetLocation();
+
+					Vector3 relVel = mVelocity;
+
+					//if other object is a cat, it might have velocity, so there might be relative velocity...
+					Tank* targetCat = target->GetAsTank();
+					if (targetCat)
+					{
+						relVel -= targetCat->mVelocity;
+					}
+
+					float relVelDotDir = Dot2D(relVel, dirToTarget);
+
+					if (relVelDotDir > 0.f)
+					{
+						Vector3 impulse = relVelDotDir * dirToTarget;
+
+						if (targetCat)
+						{
+							mVelocity -= impulse;
+							mVelocity *= mTankRestitution;
+						}
+						else
+						{
+							mVelocity -= impulse * 2.f;
+							mVelocity *= mWallRestitution;
+						}
+
+					}
 
 					//Vdiff = Vdiff * (1 / acceptableDeltaFromSourceToTarget.Length2D());
-					
-
-					//std::cout << Vdiff;
-
-					//SetLocation(sourceLocation + Vdiff);
-
-					//Vector3 relVel = mVelocity;
-
-					////if other object is a cat, it might have velocity, so there might be relative velocity...
-					//Tank* targetTank = target->GetAsTank();
-					//if (targetTank)
-					//{
-					//	std::cout << "delta : " << delta;
-					//	relVel -= targetTank->mVelocity;
-					//}
-
-					//float relVelDotDir = Dot2D(relVel, dirToTarget);
-
-					//if (relVelDotDir > 0.f)
-					//{
-					//	Vector3 impulse = relVelDotDir * dirToTarget;
-
-					//	if (targetTank)
-					//	{
-					//		mVelocity -= impulse;
-					//		mVelocity *= mTankRestitution;
-					//	}
-					//	else
-					//	{
-					//		mVelocity -= impulse * 2.f;
-					//		mVelocity *= mWallRestitution;
-					//	}
-
-					//}
 				}
 			}
 
