@@ -101,11 +101,11 @@ void Server::HandleNewClient( ClientProxyPtr inClientProxy )
 
 void Server::SpawnCatForPlayer( int inPlayerId )
 {
-	RoboCatPtr cat = std::static_pointer_cast< Tank >( GameObjectRegistry::sInstance->CreateGameObject( 'RCAT' ) );
-	cat->SetColor( ScoreBoardManager::sInstance->GetEntry( inPlayerId )->GetColor() );
-	cat->SetPlayerId( inPlayerId );
+	TankPtr tank = std::static_pointer_cast< Tank >( GameObjectRegistry::sInstance->CreateGameObject( 'RCAT' ) );
+	tank->SetColor( ScoreBoardManager::sInstance->GetEntry( inPlayerId )->GetColor() );
+	tank->SetPlayerId( inPlayerId );
 	//gotta pick a better spawn location than this...
-	cat->SetLocation( Vector3( 1.f - static_cast< float >( inPlayerId ), 0.f, 0.f ) );
+	tank->SetLocation( Vector3( 1.f - static_cast< float >( inPlayerId ), 0.f, 0.f ) );
 
 }
 
@@ -116,14 +116,14 @@ void Server::HandleLostClient( ClientProxyPtr inClientProxy )
 	int playerId = inClientProxy->GetPlayerId();
 
 	ScoreBoardManager::sInstance->RemoveEntry( playerId );
-	RoboCatPtr cat = GetCatForPlayer( playerId );
-	if( cat )
+	TankPtr tank = GetTankForPlayer( playerId );
+	if( tank )
 	{
-		cat->SetDoesWantToDie( true );
+		tank->SetDoesWantToDie( true );
 	}
 }
 
-RoboCatPtr Server::GetCatForPlayer( int inPlayerId )
+TankPtr Server::GetTankForPlayer( int inPlayerId )
 {
 	//run through the objects till we find the cat...
 	//it would be nice if we kept a pointer to the cat on the clientproxy
@@ -133,8 +133,8 @@ RoboCatPtr Server::GetCatForPlayer( int inPlayerId )
 	for( int i = 0, c = gameObjects.size(); i < c; ++i )
 	{
 		GameObjectPtr go = gameObjects[ i ];
-		Tank* cat = go->GetAsTank();
-		if( cat && cat->GetPlayerId() == inPlayerId )
+		Tank* tank = go->GetAsTank();
+		if( tank && tank->GetPlayerId() == inPlayerId )
 		{
 			return std::static_pointer_cast< Tank >( go );
 		}

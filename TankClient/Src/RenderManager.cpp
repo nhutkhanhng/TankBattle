@@ -9,6 +9,7 @@ RenderManager::RenderManager()
 	// The view transform stores both the scale factor and offset for rendering textures
 	mViewTransform.x = viewport.w / 2;
 	mViewTransform.y = viewport.h / 2;
+
 	mViewTransform.w = 100;
 	mViewTransform.h = 100;
 }

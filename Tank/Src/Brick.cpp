@@ -2,14 +2,14 @@
 
 Brick::Brick()
 {
-	SetScale( GetScale() * 0.5f );
+	SetScale( GetScale()/* * 0.5f */);
 	SetCollisionRadius( 0.25f );
 }
 
 
-bool Brick::HandleCollisionWithTank( Tank* inCat )
+bool Brick::HandleCollisionWithTank( Tank* inTank )
 {
-	( void ) inCat;
+	( void ) inTank;
 	return false;
 }
 

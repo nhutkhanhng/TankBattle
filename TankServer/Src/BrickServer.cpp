@@ -11,12 +11,12 @@ void BrickServer::HandleDying()
 }
 
 
-bool BrickServer::HandleCollisionWithTank( Tank* inCat )
+bool BrickServer::HandleCollisionWithTank( Tank* inTank )
 {
 	//kill yourself!
 	SetDoesWantToDie( true );
 
-	ScoreBoardManager::sInstance->IncScore( inCat->GetPlayerId(), 1 );
+	ScoreBoardManager::sInstance->IncScore( inTank->GetPlayerId(), 1 );
 
 	return false;
 }

@@ -7,6 +7,7 @@ public:
 
 	virtual void	Draw(const SDL_Rect& inViewTransform);
 	void			SetTexture(TexturePtr inTexture) { mTexture = inTexture; }
+	TexturePtr		GetTexture() { return mTexture; }
 	Vector3			GetOrigin()					const { return mOrigin; }
 	void			SetOrigin(const Vector3& inOrigin) { mOrigin = inOrigin; }
 private:

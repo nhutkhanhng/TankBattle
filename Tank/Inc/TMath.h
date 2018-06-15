@@ -133,6 +133,13 @@ public:
 		return Vector3( inA + t * ( inB - inA ) );
 	}
 	
+	friend std::ostream& operator << (std::ostream& os, const Vector3 &vector) 
+	{
+		os << "(" << vector.mX << ";" << vector.mY << ";" << vector.mZ << ")";
+
+		return os;
+	}
+
 	static const Vector3 Zero;
 	static const Vector3 UnitX;
 	static const Vector3 UnitY;

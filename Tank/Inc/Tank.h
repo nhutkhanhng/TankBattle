@@ -1,9 +1,9 @@
 class Tank : public GameObject
 {
 public:
-	CLASS_IDENTIFICATION( 'TANK', GameObject )
+	CLASS_IDENTIFICATION('TANK', GameObject)
 
-	enum ECatReplicationState
+	enum ETankReplicationState
 	{
 		ECRS_Pose = 1 << 0,
 		ECRS_Color = 1 << 1,
@@ -13,28 +13,27 @@ public:
 		ECRS_AllState = ECRS_Pose | ECRS_Color | ECRS_PlayerId | ECRS_Health
 	};
 
+	static	GameObject*	StaticCreate() { return new Tank(); }
 
-	static	GameObject*	StaticCreate()			{ return new Tank(); }
+	virtual uint32_t GetAllStateMask()	const override { return ECRS_AllState; }
 
-	virtual uint32_t GetAllStateMask()	const override	{ return ECRS_AllState; }
-
-	virtual	Tank*	GetAsCat()	{ return this; }
+	virtual	Tank*	GetAsTank() { return this; }
 
 	virtual void Update()	override;
 
-	void ProcessInput( float inDeltaTime, const InputState& inInputState );
-	void SimulateMovement( float inDeltaTime );
+	void ProcessInput(float inDeltaTime, const InputState& inInputState);
+	void SimulateMovement(float inDeltaTime);
 
 	void ProcessCollisions();
 	void ProcessCollisionsWithScreenWalls();
 
-	void		SetPlayerId( uint32_t inPlayerId )			{ mPlayerId = inPlayerId; }
-	uint32_t	GetPlayerId()						const 	{ return mPlayerId; }
+	void		SetPlayerId(uint32_t inPlayerId) { mPlayerId = inPlayerId; }
+	uint32_t	GetPlayerId()						const { return mPlayerId; }
 
-	void			SetVelocity( const Vector3& inVelocity )	{ mVelocity = inVelocity; }
-	const Vector3&	GetVelocity()						const	{ return mVelocity; }
+	void			SetVelocity(const Vector3& inVelocity) { mVelocity = inVelocity; }
+	const Vector3&	GetVelocity()						const { return mVelocity; }
 
-	virtual uint32_t	Write( OutputMemoryBitStream& inOutputStream, uint32_t inDirtyState ) const override;
+	virtual uint32_t	Write(OutputMemoryBitStream& inOutputStream, uint32_t inDirtyState) const override;
 
 protected:
 	Tank();
@@ -42,7 +41,7 @@ protected:
 private:
 
 
-	void	AdjustVelocityByThrust( float inDeltaTime );
+	void	AdjustVelocityByThrust(float inDeltaTime);
 
 	Vector3				mVelocity;
 
@@ -52,15 +51,14 @@ private:
 
 	//bounce fraction when hitting various things
 	float				mWallRestitution;
-	float				mCatRestitution;
-
+	float				mTankRestitution;
 
 	uint32_t			mPlayerId;
 
 protected:
 
 	///move down here for padding reasons...
-	
+
 	float				mLastMoveTimestamp;
 
 	float				mThrustDir;
@@ -68,10 +66,10 @@ protected:
 
 	bool				mIsShooting;
 
-	
+
 
 
 
 };
 
-typedef shared_ptr< Tank >	RoboCatPtr;
+typedef shared_ptr< Tank >	TankPtr;

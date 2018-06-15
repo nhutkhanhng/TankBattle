@@ -1,8 +1,8 @@
 #include <TankPCH.h>
 
 //zoom hardcoded at 100...if we want to lock players on screen, this could be calculated from zoom
-const float HALF_WORLD_HEIGHT = 3.6f;
-const float HALF_WORLD_WIDTH = 6.4f;
+const float HALF_WORLD_HEIGHT = 7.2f;
+const float HALF_WORLD_WIDTH = 12.8f;
 
 Tank::Tank() :
 	GameObject(),
@@ -10,24 +10,63 @@ Tank::Tank() :
 	mMaxLinearSpeed( 50.f ),
 	mVelocity( Vector3::Zero ),
 	mWallRestitution( 0.1f ),
-	mCatRestitution( 0.1f ),
+	mTankRestitution( 0.1f ),
 	mThrustDir( 0.f ),
 	mPlayerId( 0 ),
 	mIsShooting( false ),
 	mHealth( 10 )
 {
-	SetCollisionRadius( 0.5f );
+	SetCollisionRadius( 0.3 );
+}
+
+namespace {
+
+	bool double_equals(double a, double b, double epsilon = DBL_EPSILON)
+	{
+		return std::abs(a - b) < epsilon;
+	}
 }
 
 void Tank::ProcessInput( float inDeltaTime, const InputState& inInputState )
 {
-	float newRotation = GetRotation() + inInputState.GetDesiredHorizontalDelta() * mMaxRotationSpeed * inDeltaTime;
-	SetRotation( newRotation );
+	/*std::cout << "GetDesirdHorizontalDelta" << inInputState.GetDesiredHorizontalDelta() << ","<< inInputState.GetDesiredVerticalDelta();*/
 
-	float inputForwardDelta = inInputState.GetDesiredVerticalDelta();
+	float Direction = 0.f;
+
+	float inputForwardDelta = 0.f;
+
+	if ( (double_equals(inInputState.GetDesiredHorizontalDelta(), 0.f) 
+		&& double_equals(inInputState.GetDesiredVerticalDelta(), 0.f))
+													== false)
+	{
+		// float newRotation = GetRotation() + inInputState.GetDesiredHorizontalDelta() * mMaxRotationSpeed * inDeltaTime;
+		//std::cout << "\nHorizontalDela()" << inInputState.GetDesiredHorizontalDelta();
+		std::cout << "\nGetDesiredVerticalDelta()" << inInputState.GetDesiredVerticalDelta();
+
+		float Direction = ((inInputState.GetDesiredVerticalDelta() > 0) ? 0.f : 3.14159f);
+
+		if (inInputState.GetDesiredHorizontalDelta() != 0)
+			Direction = inInputState.GetDesiredHorizontalDelta() * 1.5708f;
+
+		//if (inInputState.GetDesiredVerticalDelta() < 0.f)
+		//	Direction *= -1.f;
+
+		// inInputState.GetDesiredHorizontalDelta() * 1.5f + inInputState.GetDesiredVerticalDelta() * 3.f
+
+
+		if (GetRotation() == Direction)
+			inputForwardDelta = 1.f;
+
+		//std::cout << "\nDirection : " << Direction;
+
+		SetRotation(Direction);
+
+		std::cout << "\nLocation" << GetLocation();
+	}
+
 	mThrustDir = inputForwardDelta;
 
-	mIsShooting = inInputState.IsShooting(); 
+	mIsShooting = inInputState.IsShooting();
 }
 
 void Tank::AdjustVelocityByThrust( float inDeltaTime )
@@ -48,6 +87,22 @@ void Tank::Update()
 	
 }
 
+namespace {
+	bool CollideBox(const GameObject& A	, const GameObject& B)
+	{
+		if ((A.GetLocation().mX + A.GetCollisionRadius() >= B.GetLocation().mX - B.GetCollisionRadius()) &&
+			(A.GetLocation().mX - A.GetCollisionRadius() <= B.GetLocation().mX + B.GetCollisionRadius()) &&
+			(A.GetLocation().mY + A.GetCollisionRadius() >= B.GetLocation().mY - B.GetCollisionRadius()) &&
+			(A.GetLocation().mY - A.GetCollisionRadius() <= B.GetLocation().mY + B.GetCollisionRadius())
+			)
+		{
+			// set collision vector
+			return true;
+		}
+
+		return false;
+	}
+}
 void Tank::ProcessCollisions()
 {
 	//right now just bounce off the sides..
@@ -65,50 +120,133 @@ void Tank::ProcessCollisions()
 			float targetRadius = target->GetCollisionRadius();
 
 			Vector3 delta = targetLocation - sourceLocation;
+
 			float distSq = delta.LengthSq2D();
 			float collisionDist = ( sourceRadius + targetRadius );
-			if( distSq < ( collisionDist * collisionDist ) )
+
+			Tank* targetTank = target->GetAsTank();
+			Vector3 Vdiff;
+
+			if (targetTank)
+				Vdiff = this->GetVelocity() - targetTank->GetVelocity();
+			else
+				Vdiff = this->GetVelocity();
+
+
+			Vdiff.Normalize2D();
+
+			float CUV = Dot2D(delta,Vdiff);
+
+			if (CollideBox(*this, *target))
 			{
-				if( target->HandleCollisionWithTank( this ) )
+				if (target->HandleCollisionWithTank(this))
 				{
 
 					Vector3 dirToTarget = delta;
+
 					dirToTarget.Normalize2D();
 
-					Vector3 acceptableDeltaFromSourceToTarget = dirToTarget * collisionDist;
 					
-					SetLocation( targetLocation - acceptableDeltaFromSourceToTarget );
 
+					std::cout << "DirToTarget" << dirToTarget;
+					std::cout << "Vecloctiy" << GetVelocity();
+
+					//if (GetForwardVector().Length() > 0)
+					//	dirToTarget = dirToTarget * GetForwardVector() * GetForwardVector();
+
+					std::cout << "\nDirToTarget" << dirToTarget;
+
+					Vector3 acceptableDeltaFromSourceToTarget;
+
+					if (GetForwardVector().Length > 0)
+						acceptableDeltaFromSourceToTarget = dirToTarget * collisionDist * GetForwardVector() * GetForwardVector();
+					else
+						acceptableDeltaFromSourceToTarget = dirToTarget * collisionDist;
+					std::cout << "\nDirToTarget" << acceptableDeltaFromSourceToTarget;
+
+					SetLocation(targetLocation - acceptableDeltaFromSourceToTarget/* - sourceLocation*/);
+
+					//Vdiff = Vdiff * (1 / acceptableDeltaFromSourceToTarget.Length2D());
 					
-					Vector3 relVel = mVelocity;
-				
-					//if other object is a cat, it might have velocity, so there might be relative velocity...
-					Tank* targetCat = target->GetAsTank();
-					if( targetCat )
-					{
-						relVel -= targetCat->mVelocity;
-					}
 
-					float relVelDotDir = Dot2D( relVel, dirToTarget );
+					//std::cout << Vdiff;
 
-					if (relVelDotDir > 0.f)
-					{
-						Vector3 impulse = relVelDotDir * dirToTarget;
-					
-						if( targetCat )
-						{
-							mVelocity -= impulse;
-							mVelocity *= mCatRestitution;
-						}
-						else
-						{
-							mVelocity -= impulse * 2.f;
-							mVelocity *= mWallRestitution;
-						}
+					//SetLocation(sourceLocation + Vdiff);
 
-					}
+					//Vector3 relVel = mVelocity;
+
+					////if other object is a cat, it might have velocity, so there might be relative velocity...
+					//Tank* targetTank = target->GetAsTank();
+					//if (targetTank)
+					//{
+					//	std::cout << "delta : " << delta;
+					//	relVel -= targetTank->mVelocity;
+					//}
+
+					//float relVelDotDir = Dot2D(relVel, dirToTarget);
+
+					//if (relVelDotDir > 0.f)
+					//{
+					//	Vector3 impulse = relVelDotDir * dirToTarget;
+
+					//	if (targetTank)
+					//	{
+					//		mVelocity -= impulse;
+					//		mVelocity *= mTankRestitution;
+					//	}
+					//	else
+					//	{
+					//		mVelocity -= impulse * 2.f;
+					//		mVelocity *= mWallRestitution;
+					//	}
+
+					//}
 				}
 			}
+
+		/*	if( distSq < ( collisionDist * collisionDist ) )
+			{*/
+				//if (target->HandleCollisionWithTank(this))
+				//{
+
+				//	Vector3 dirToTarget = delta;
+				//	dirToTarget.Normalize2D();
+
+				//	Vector3 acceptableDeltaFromSourceToTarget = dirToTarget * collisionDist;
+
+				//	SetLocation(targetLocation - acceptableDeltaFromSourceToTarget);
+
+
+				//	Vector3 relVel = mVelocity;
+
+				//	//if other object is a cat, it might have velocity, so there might be relative velocity...
+				//	Tank* targetTank = target->GetAsTank();
+				//	if (targetTank)
+				//	{
+				//		std::cout << "delta : " << delta;
+				//		relVel -= targetTank->mVelocity;
+				//	}
+
+				//	float relVelDotDir = Dot2D(relVel, dirToTarget);
+
+				//	if (relVelDotDir > 0.f)
+				//	{
+				//		Vector3 impulse = relVelDotDir * dirToTarget;
+
+				//		if (targetTank)
+				//		{
+				//			mVelocity -= impulse;
+				//			mVelocity *= mTankRestitution;
+				//		}
+				//		else
+				//		{
+				//			mVelocity -= impulse * 2.f;
+				//			mVelocity *= mWallRestitution;
+				//		}
+
+				//	}
+				//}
+			/*}*/
 		}
 	}
 
@@ -181,6 +319,7 @@ uint32_t Tank::Write( OutputMemoryBitStream& inOutputStream, uint32_t inDirtySta
 		inOutputStream.Write( location.mX );
 		inOutputStream.Write( location.mY );
 
+		/*std::cout << "\nWriteRotation" << GetRotation();*/
 		inOutputStream.Write( GetRotation() );
 
 		writtenState |= ECRS_Pose;

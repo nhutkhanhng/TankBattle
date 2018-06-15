@@ -20,7 +20,11 @@ void GameObject::Update()
 Vector3 GameObject::GetForwardVector()	const
 {
 	//should we cache this when you turn?
-	return Vector3( sinf( mRotation ), -cosf( mRotation ), 0.f );
+	//std::cout << "mRotation" << mRotation << std::endl;
+	//std::cout << Vector3(sinf(mRotation), -cosf(mRotation), 0.f);
+
+	return Vector3(floor(sinf(mRotation)), -ceil (cosf(mRotation)), 0.f);
+	/*return Vector3(floor(sinf( mRotation )), -cosf( mRotation ), 0.f );*/
 }
 
 void GameObject::SetNetworkId( int inNetworkId )

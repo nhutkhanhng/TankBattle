@@ -4,6 +4,9 @@ enum { kClassId = inCode }; \
 virtual uint32_t GetClassId() const { return kClassId; } \
 static GameObject* CreateInstance() { return static_cast< GameObject* >( new inClass() ); } \
 
+
+
+
 class GameObject
 {
 public:
@@ -14,7 +17,7 @@ public:
 	virtual ~GameObject() {}
 	virtual	Tank*	GetAsTank() { return nullptr; }
 	virtual uint32_t GetAllStateMask()	const { return 0; }
-	virtual bool	HandleCollisionWithTank(Tank* inCat) { (void)inCat; return true; }
+	virtual bool	HandleCollisionWithTank(Tank* inTank) { (void)inTank; return true; }
 	virtual void	Update();
 	virtual void	HandleDying() {}
 

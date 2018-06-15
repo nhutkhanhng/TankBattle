@@ -5,7 +5,7 @@ Bullet::Bullet() :
 	mVelocity( Vector3::Zero ),
 	mPlayerId( 0 )
 {
-	SetScale( GetScale() * 0.25f );
+	SetScale( GetScale()/* * 0.25f */);
 	SetCollisionRadius( 0.125f );
 }
 

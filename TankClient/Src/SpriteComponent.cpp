@@ -34,14 +34,17 @@ void SpriteComponent::Draw( const SDL_Rect& inViewTransform )
 		Vector3 objLocation = mGameObject->GetLocation();
 
 		float objScale = mGameObject->GetScale();
+
 		SDL_Rect dstRect;
+		
 		dstRect.w = static_cast< int >( mTexture->GetWidth() * objScale );
 		dstRect.h = static_cast< int >( mTexture->GetHeight() * objScale );
 
+
 		// Set Center6
-		dstRect.x = static_cast<int>( objLocation.mX * inViewTransform.w + inViewTransform.x /*- dstRect.w / 2*/ );
-		dstRect.y = static_cast<int>( objLocation.mY * inViewTransform.h + inViewTransform.y /*- dstRect.h / 2*/ );
-		
+		dstRect.x = static_cast<int>( objLocation.mX * inViewTransform.w + inViewTransform.x - dstRect.w / 2 );
+		dstRect.y = static_cast<int>( objLocation.mY * inViewTransform.h + inViewTransform.y - dstRect.h / 2 );
+
 		// Blit the texture
 		SDL_RenderCopyEx( GraphicsDriver::sInstance->GetRenderer(), mTexture->GetData(), nullptr,
 			&dstRect, TMath::ToDegrees( mGameObject->GetRotation() ), nullptr, SDL_FLIP_NONE );

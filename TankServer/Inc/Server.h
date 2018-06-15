@@ -11,7 +11,7 @@ public:
 	void HandleNewClient( ClientProxyPtr inClientProxy );
 	void HandleLostClient( ClientProxyPtr inClientProxy );
 
-	RoboCatPtr	GetCatForPlayer( int inPlayerId );
+	TankPtr	GetTankForPlayer( int inPlayerId );
 	void	SpawnCatForPlayer( int inPlayerId );
 
 

@@ -8,6 +8,9 @@ TankClient::TankClient() :
 {
 	mSpriteComponent.reset(new SpriteComponent(this));
 	mSpriteComponent->SetTexture(TextureManager::sInstance->GetTexture("Tank"));
+
+
+	std::cout << "Texture " << mSpriteComponent->GetTexture()->GetHeight() << mSpriteComponent->GetTexture()->GetWidth();
 }
 
 void TankClient::HandleDying()
@@ -86,6 +89,7 @@ void TankClient::Read(InputMemoryBitStream& inInputStream)
 		SetLocation(replicatedLocation);
 
 		inInputStream.Read(replicatedRotation);
+		std::cout << "\nReadRotation from server" << replicatedRotation;
 		SetRotation(replicatedRotation);
 
 		readState |= ECRS_Pose;
@@ -178,9 +182,9 @@ void TankClient::DoClientSidePredictionAfterReplicationForLocalTank(uint32_t inR
 }
 
 
-void TankClient::InterpolateClientSidePrediction(float inOldRotation, const Vector3& inOldLocation, const Vector3& inOldVelocity, bool inIsForRemoteCat)
+void TankClient::InterpolateClientSidePrediction(float inOldRotation, const Vector3& inOldLocation, const Vector3& inOldVelocity, bool inIsForRemoteTank)
 {
-	if (inOldRotation != GetRotation() && !inIsForRemoteCat)
+	if (inOldRotation != GetRotation() && !inIsForRemoteTank)
 	{
 		LOG("ERROR! Move replay ended with incorrect rotation!", 0);
 	}
@@ -201,7 +205,7 @@ void TankClient::InterpolateClientSidePrediction(float inOldRotation, const Vect
 		float durationOutOfSync = time - mTimeLocationBecameOutOfSync;
 		if (durationOutOfSync < roundTripTime)
 		{
-			SetLocation(Lerp(inOldLocation, GetLocation(), inIsForRemoteCat ? (durationOutOfSync / roundTripTime) : 0.1f));
+			SetLocation(Lerp(inOldLocation, GetLocation(), inIsForRemoteTank ? (durationOutOfSync / roundTripTime) : 0.1f));
 		}
 	}
 	else
@@ -226,7 +230,7 @@ void TankClient::InterpolateClientSidePrediction(float inOldRotation, const Vect
 		float durationOutOfSync = time - mTimeVelocityBecameOutOfSync;
 		if (durationOutOfSync < roundTripTime)
 		{
-			SetVelocity(Lerp(inOldVelocity, GetVelocity(), inIsForRemoteCat ? (durationOutOfSync / roundTripTime) : 0.1f));
+			SetVelocity(Lerp(inOldVelocity, GetVelocity(), inIsForRemoteTank ? (durationOutOfSync / roundTripTime) : 0.1f));
 		}
 		//otherwise, fine...
 

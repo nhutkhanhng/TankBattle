@@ -3,6 +3,7 @@ class InputState
 {
 public:
 
+
 	InputState() :
 	mDesiredRightAmount( 0 ),
 	mDesiredLeftAmount( 0 ),
@@ -21,7 +22,9 @@ public:
 private:
 	friend class InputManager;
 
-	float	mDesiredRightAmount, mDesiredLeftAmount;
-	float	mDesiredForwardAmount, mDesiredBackAmount;
-	bool	mIsShooting;
+	float			mDesiredRightAmount, mDesiredLeftAmount;
+	float			mDesiredForwardAmount, mDesiredBackAmount;
+	bool			mIsShooting;
+	
+
 };
