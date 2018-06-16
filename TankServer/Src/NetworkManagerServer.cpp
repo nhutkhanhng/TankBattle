@@ -29,12 +29,9 @@ void NetworkManagerServer::HandleConnectionReset( const SocketAddress& inFromAdd
 
 void NetworkManagerServer::ProcessPacket( InputMemoryBitStream& inInputStream, const SocketAddress& inFromAddress )
 {
-	//try to get the client proxy for this address
-	//pass this to the client proxy to process
 	auto it = mAddressToClientMap.find( inFromAddress );
 	if( it == mAddressToClientMap.end() )
 	{
-		//didn't find one? it's a new cilent..is the a HELO? if so, create a client proxy...
 		HandlePacketFromNewClient( inInputStream, inFromAddress );
 	}
 	else
@@ -46,7 +43,6 @@ void NetworkManagerServer::ProcessPacket( InputMemoryBitStream& inInputStream, c
 
 void NetworkManagerServer::ProcessPacket( ClientProxyPtr inClientProxy, InputMemoryBitStream& inInputStream )
 {
-	//remember we got a packet so we know not to disconnect for a bit
 	inClientProxy->UpdateLastPacketTime();
 
 	uint32_t	packetType;
@@ -54,8 +50,6 @@ void NetworkManagerServer::ProcessPacket( ClientProxyPtr inClientProxy, InputMem
 	switch( packetType )
 	{
 	case kHelloCC:
-		//need to resend welcome. to be extra safe we should check the name is the one we expect from this address,
-		//otherwise something weird is going on...
 		SendWelcomePacket( inClientProxy );
 		break;
 	case kInputCC:
@@ -73,7 +67,6 @@ void NetworkManagerServer::ProcessPacket( ClientProxyPtr inClientProxy, InputMem
 
 void NetworkManagerServer::HandlePacketFromNewClient( InputMemoryBitStream& inInputStream, const SocketAddress& inFromAddress )
 {
-	//read the beginning- is it a hello?
 	uint32_t	packetType;
 	inInputStream.Read( packetType );
 	if(  packetType == kHelloCC )
@@ -85,15 +78,10 @@ void NetworkManagerServer::HandlePacketFromNewClient( InputMemoryBitStream& inIn
 		mAddressToClientMap[ inFromAddress ] = newClientProxy;
 		mPlayerIdToClientMap[ newClientProxy->GetPlayerId() ] = newClientProxy;
 		
-		//tell the server about this client, spawn a cat, etc...
-		//if we had a generic message system, this would be a good use for it...
-		//instead we'll just tell the server directly
+		
 		static_cast< Server* > ( Engine::sInstance.get() )->HandleNewClient( newClientProxy );
 
-		//and welcome the client...
 		SendWelcomePacket( newClientProxy );
-
-		//and now init the replication manager with everything we know about!
 		for( const auto& pair: mNetworkIdToGameObjectMap )
 		{
 			newClientProxy->GetReplicationManagerServer().ReplicateCreate( pair.first, pair.second->GetAllStateMask() );
@@ -101,7 +89,6 @@ void NetworkManagerServer::HandlePacketFromNewClient( InputMemoryBitStream& inIn
 	}
 	else
 	{
-		//bad incoming packet from unknown client- we're under attack!!
 		LOG( "Bad incoming packet from unknown client at socket %s", inFromAddress.ToString().c_str() );
 	}
 }
@@ -136,7 +123,7 @@ void NetworkManagerServer::SendOutgoingPackets()
 	for( auto it = mAddressToClientMap.begin(), end = mAddressToClientMap.end(); it != end; ++it )
 	{
 		ClientProxyPtr clientProxy = it->second;
-		//process any timed out packets while we're going through the list
+		
 		clientProxy->GetDeliveryNotificationManager().ProcessTimedOutPackets();
 
 		if( clientProxy->IsLastMoveTimestampDirty() )
@@ -159,16 +146,12 @@ void NetworkManagerServer::UpdateAllClients()
 
 void NetworkManagerServer::SendStatePacketToClient( ClientProxyPtr inClientProxy )
 {
-	//build state packet
 	OutputMemoryBitStream	statePacket;
-
-	//it's state!
 	statePacket.Write( kStateCC );
 
 	InFlightPacket* ifp = inClientProxy->GetDeliveryNotificationManager().WriteState( statePacket );
 
 	WriteLastMoveTimestampIfDirty( statePacket, inClientProxy );
-
 	AddScoreBoardStateToPacket( statePacket );
 
 	ReplicationManagerTransmissionData* rmtd = new ReplicationManagerTransmissionData( &inClientProxy->GetReplicationManagerServer() );
@@ -181,7 +164,6 @@ void NetworkManagerServer::SendStatePacketToClient( ClientProxyPtr inClientProxy
 
 void NetworkManagerServer::WriteLastMoveTimestampIfDirty( OutputMemoryBitStream& inOutputStream, ClientProxyPtr inClientProxy )
 {
-	//first, dirty?
 	bool isTimestampDirty = inClientProxy->IsLastMoveTimestampDirty();
 	inOutputStream.Write( isTimestampDirty );
 	if( isTimestampDirty )
@@ -191,12 +173,11 @@ void NetworkManagerServer::WriteLastMoveTimestampIfDirty( OutputMemoryBitStream&
 	}
 }
 
-//should we ask the server for this? or run through the world ourselves?
+
 void NetworkManagerServer::AddWorldStateToPacket( OutputMemoryBitStream& inOutputStream )
 {
 	const auto& gameObjects = World::sInstance->GetGameObjects();
 
-	//now start writing objects- do we need to remember how many there are? we can check first...
 	inOutputStream.Write( gameObjects.size() );
 
 	for( GameObjectPtr gameObject : gameObjects )

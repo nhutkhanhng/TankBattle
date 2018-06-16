@@ -55,9 +55,6 @@ int RenderManager::GetComponentIndex( SpriteComponent* inComponent ) const
 }
 
 
-//this part that renders the world is really a camera-
-//in a more detailed engine, we'd have a list of cameras, and then render manager would
-//render the cameras in order
 void RenderManager::RenderComponents()
 {
 	//Get the logical viewport so we can pass this to the SpriteComponents when it's draw time

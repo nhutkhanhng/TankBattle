@@ -4,14 +4,13 @@
 
 std::unique_ptr< Engine >	Engine::sInstance;
 
-
 Engine::Engine() :
-mShouldKeepRunning( true )
+	mShouldKeepRunning(true)
 {
 	SocketUtil::StaticInit();
 
-	srand( static_cast< uint32_t >( time( nullptr ) ) );
-	
+	srand(static_cast<uint32_t>(time(nullptr)));
+
 	GameObjectRegistry::StaticInit();
 
 
@@ -19,7 +18,7 @@ mShouldKeepRunning( true )
 
 	ScoreBoardManager::StaticInit();
 
-	SDL_Init( SDL_INIT_VIDEO | SDL_INIT_AUDIO );
+	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 }
 
 Engine::~Engine()
@@ -30,37 +29,35 @@ Engine::~Engine()
 }
 
 
-
-
 int Engine::Run()
 {
 	return DoRunLoop();
 }
 
-void Engine::HandleEvent( SDL_Event* inEvent )
+void Engine::HandleEvent(SDL_Event* inEvent)
 {
-	// Default implementation does nothing, up to derived classes to handle them, if they so choose
-	( void )inEvent;
+	(void)inEvent;
 }
 
 int Engine::DoRunLoop()
 {
-	// Main message loop
 	bool quit = false;
-	SDL_Event event;
-	memset( &event, 0, sizeof( SDL_Event ) );
 
-	while( !quit && mShouldKeepRunning )
+	SDL_Event event;
+
+	memset(&event, 0, sizeof(SDL_Event));
+
+	while (!quit && mShouldKeepRunning)
 	{
-		if( SDL_PollEvent( &event ) )
+		if (SDL_PollEvent(&event))
 		{
-			if( event.type == SDL_QUIT )
+			if (event.type == SDL_QUIT)
 			{
 				quit = true;
 			}
 			else
 			{
-				HandleEvent( &event );
+				HandleEvent(&event);
 			}
 		}
 		else
@@ -79,4 +76,4 @@ void Engine::DoFrame()
 	World::sInstance->Update();
 }
 
-	
+

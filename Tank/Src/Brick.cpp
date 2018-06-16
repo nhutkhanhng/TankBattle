@@ -2,81 +2,81 @@
 
 Brick::Brick()
 {
-	SetScale( GetScale()/* * 0.5f */);
-	SetCollisionRadius( 0.25f );
+	SetScale(GetScale()/* * 0.5f */);
+	SetCollisionRadius(0.3f);
 }
 
 
-bool Brick::HandleCollisionWithTank( Tank* inTank )
+bool Brick::HandleCollisionWithTank(Tank* inTank)
 {
-	( void ) inTank;
-	return false;
+	(void)inTank;
+	return true;
 }
 
 
-
-uint32_t Brick::Write( OutputMemoryBitStream& inOutputStream, uint32_t inDirtyState ) const 
+#pragma region Write and Read MemoryStream
+uint32_t Brick::Write(OutputMemoryBitStream& inOutputStream, uint32_t inDirtyState) const
 {
 	uint32_t writtenState = 0;
 
-	if( inDirtyState & EMRS_Pose )
+	if (inDirtyState & EBrRS_Pose)
 	{
-		inOutputStream.Write( (bool)true );
+		inOutputStream.Write((bool)true);
 
 		Vector3 location = GetLocation();
-		inOutputStream.Write( location.mX );
-		inOutputStream.Write( location.mY );
+		inOutputStream.Write(location.mX);
+		inOutputStream.Write(location.mY);
 
-		inOutputStream.Write( GetRotation() );
+		inOutputStream.Write(GetRotation());
 
-		writtenState |= EMRS_Pose;
+		writtenState |= EBrRS_Pose;
 	}
 	else
 	{
-		inOutputStream.Write( (bool)false );
+		inOutputStream.Write((bool)false);
 	}
 
-	if( inDirtyState & EMRS_Color )
+	if (inDirtyState & EBrRS_Color)
 	{
-		inOutputStream.Write( (bool)true );
+		inOutputStream.Write((bool)true);
 
-		inOutputStream.Write( GetColor() );
+		inOutputStream.Write(GetColor());
 
-		writtenState |= EMRS_Color;
+		writtenState |= EBrRS_Color;
 	}
 	else
 	{
-		inOutputStream.Write( (bool)false );
+		inOutputStream.Write((bool)false);
 	}
 
 
 	return writtenState;
 }
 
-void Brick::Read( InputMemoryBitStream& inInputStream )
+void Brick::Read(InputMemoryBitStream& inInputStream)
 {
 	bool stateBit;
 
-	inInputStream.Read( stateBit );
-	if( stateBit )
+	inInputStream.Read(stateBit);
+	if (stateBit)
 	{
 		Vector3 location;
-		inInputStream.Read( location.mX );
-		inInputStream.Read( location.mY );
-		SetLocation( location );
+		inInputStream.Read(location.mX);
+		inInputStream.Read(location.mY);
+		SetLocation(location);
 
 		float rotation;
-		inInputStream.Read( rotation );
-		SetRotation( rotation );
+		inInputStream.Read(rotation);
+		SetRotation(rotation);
 	}
 
 
-	inInputStream.Read( stateBit );
-	if( stateBit )
-	{	
+	inInputStream.Read(stateBit);
+	if (stateBit)
+	{
 		Vector3 color;
-		inInputStream.Read( color );
-		SetColor( color );
+		inInputStream.Read(color);
+		SetColor(color);
 	}
 }
-
+#pragma endregion

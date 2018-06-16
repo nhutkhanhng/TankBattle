@@ -4,7 +4,7 @@ std::unique_ptr< WindowManager >	WindowManager::sInstance;
 
 bool WindowManager::StaticInit()
 {
-	SDL_Window* wnd = SDL_CreateWindow( "Tank!", 100, 100, 680, 360, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE );
+	SDL_Window* wnd = SDL_CreateWindow( "TankBatlle", 100, 100, 640, 360, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE );
 	
 	if (wnd == nullptr)
 	{

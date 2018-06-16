@@ -1,7 +1,7 @@
-enum ECatControlType
+enum ETankControlType
 {
-	ESCT_Human,
-	ESCT_AI
+	ETCT_Human,
+	ETCT_AI
 };
 
 class TankServer : public Tank
@@ -12,7 +12,7 @@ public:
 
 	virtual void Update();
 
-	void SetCatControlType( ECatControlType inCatControlType ) { mCatControlType = inCatControlType; }
+	void SetCatControlType( ETankControlType inCatControlType ) { mTankControlType = inCatControlType; }
 
 	void TakeDamage( int inDamagingPlayerId );
 
@@ -23,7 +23,7 @@ private:
 
 	void HandleShooting();
 
-	ECatControlType	mCatControlType;
+	ETankControlType	mTankControlType;
 
 
 	float		mTimeOfNextShot;

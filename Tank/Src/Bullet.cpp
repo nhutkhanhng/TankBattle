@@ -5,7 +5,7 @@ Bullet::Bullet() :
 	mVelocity( Vector3::Zero ),
 	mPlayerId( 0 )
 {
-	SetScale( GetScale()/* * 0.25f */);
+	SetScale( GetScale() * 0.25f );
 	SetCollisionRadius( 0.125f );
 }
 
@@ -15,7 +15,7 @@ uint32_t Bullet::Write( OutputMemoryBitStream& inOutputStream, uint32_t inDirtyS
 {
 	uint32_t writtenState = 0;
 
-	if( inDirtyState & EYRS_Pose )
+	if( inDirtyState & EBRS_Pose )
 	{
 		inOutputStream.Write( (bool)true );
 
@@ -29,33 +29,33 @@ uint32_t Bullet::Write( OutputMemoryBitStream& inOutputStream, uint32_t inDirtyS
 
 		inOutputStream.Write( GetRotation() );
 
-		writtenState |= EYRS_Pose;
+		writtenState |= EBRS_Pose;
 	}
 	else
 	{
 		inOutputStream.Write( (bool)false );
 	}
 
-	if( inDirtyState & EYRS_Color )
+	if( inDirtyState & EBRS_Color )
 	{
 		inOutputStream.Write( (bool)true );
 
 		inOutputStream.Write( GetColor() );
 
-		writtenState |= EYRS_Color;
+		writtenState |= EBRS_Color;
 	}
 	else
 	{
 		inOutputStream.Write( (bool)false );
 	}
 
-	if( inDirtyState & EYRS_PlayerId )
+	if( inDirtyState & EBRS_PlayerId )
 	{
 		inOutputStream.Write( (bool)true );
 
 		inOutputStream.Write( mPlayerId, 8 );
 
-		writtenState |= EYRS_PlayerId;
+		writtenState |= EBRS_PlayerId;
 	}
 	else
 	{
@@ -70,13 +70,9 @@ uint32_t Bullet::Write( OutputMemoryBitStream& inOutputStream, uint32_t inDirtyS
 
 
 
-bool Bullet::HandleCollisionWithTank( Tank* inCat )
+bool Bullet::HandleCollisionWithTank( Tank* inTank )
 {
-	( void ) inCat;
-
-	//you hit a cat, so look like you hit a cat
-	
-
+	( void ) inTank;
 
 	return false;
 }
@@ -89,11 +85,27 @@ void Bullet::InitFromShooter( Tank* inShooter )
 
 	Vector3 forward = inShooter->GetForwardVector();
 	SetVelocity( inShooter->GetVelocity() + forward * mMuzzleSpeed );
-	SetLocation( inShooter->GetLocation() /* + forward * 0.55f */ );
+	SetLocation( inShooter->GetLocation() + forward * inShooter->GetCollisionRadius() * 1.5f );
 
 	SetRotation( inShooter->GetRotation() );
 }
 
+namespace {
+	bool CollideBox(const GameObject& A, const GameObject& B)
+	{
+		if ((A.GetLocation().mX + A.GetCollisionRadius() * A.GetScale() >= B.GetLocation().mX - B.GetCollisionRadius())* B.GetScale() &&
+			(A.GetLocation().mX - A.GetCollisionRadius() * A.GetScale() <= B.GetLocation().mX + B.GetCollisionRadius())* B.GetScale() &&
+			(A.GetLocation().mY + A.GetCollisionRadius() * A.GetScale() >= B.GetLocation().mY - B.GetCollisionRadius())* B.GetScale() &&
+			(A.GetLocation().mY - A.GetCollisionRadius()* A.GetScale() <= B.GetLocation().mY + B.GetCollisionRadius() *B.GetScale())
+			)
+		{
+			// set collision vector
+			return true;
+		}
+
+		return false;
+	}
+}
 
 // Interpolation
 void Bullet::Update()
@@ -102,5 +114,19 @@ void Bullet::Update()
 	float deltaTime = Timing::sInstance.GetDeltaTime();
 
 	SetLocation( GetLocation() + mVelocity * deltaTime );
-	//we'll let the cats handle the collisions
+
+		float sourceRadius = GetCollisionRadius();
+		Vector3 sourceLocation = GetLocation();
+
+		for (auto goIt = World::sInstance->GetGameObjects().begin(), end = World::sInstance->GetGameObjects().end(); goIt != end; ++goIt)
+		{
+			GameObject* target = goIt->get();
+			if (target != this && !target->DoesWantToDie())
+			{
+				if (CollideBox(*this, *target))
+				{
+					SetDoesWantToDie(true);
+				}
+			}
+		}
 }

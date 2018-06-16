@@ -1,7 +1,7 @@
 #include <TankServerPCH.h>
 
 TankServer::TankServer() :
-	mCatControlType( ESCT_Human ),
+	mTankControlType( ETCT_Human ),
 	mTimeOfNextShot( 0.f ),
 	mTimeBetweenShots( 0.2f )
 {}
@@ -19,9 +19,7 @@ void TankServer::Update()
 	Vector3 oldVelocity = GetVelocity();
 	float oldRotation = GetRotation();
 
-	//are you controlled by a player?
-	//if so, is there a move we haven't processed yet?
-	if( mCatControlType == ESCT_Human )
+	if( mTankControlType == ETCT_Human )
 	{
 		ClientProxyPtr client = NetworkManagerServer::sInstance->GetClientProxy( GetPlayerId() );
 		if( client )
@@ -69,8 +67,8 @@ void TankServer::HandleShooting()
 		mTimeOfNextShot = time + mTimeBetweenShots;
 
 		//fire!
-		YarnPtr yarn = std::static_pointer_cast< Bullet >( GameObjectRegistry::sInstance->CreateGameObject( 'YARN' ) );
-		yarn->InitFromShooter( this );
+		BulletPtr bullet = std::static_pointer_cast< Bullet >( GameObjectRegistry::sInstance->CreateGameObject( 'BULT' ) );
+		bullet->InitFromShooter( this );
 	}
 }
 
@@ -79,17 +77,14 @@ void TankServer::TakeDamage( int inDamagingPlayerId )
 	mHealth--;
 	if( mHealth <= 0.f )
 	{
-		//score one for damaging player...
 		ScoreBoardManager::sInstance->IncScore( inDamagingPlayerId, 1 );
-
-		//and you want to die
 		SetDoesWantToDie( true );
 
-		//tell the client proxy to make you a new cat
 		ClientProxyPtr clientProxy = NetworkManagerServer::sInstance->GetClientProxy( GetPlayerId() );
+
 		if( clientProxy )
 		{
-			clientProxy->HandleCatDied();
+			clientProxy->HandleTankDied();
 		}
 	}
 

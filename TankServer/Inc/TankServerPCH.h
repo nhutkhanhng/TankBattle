@@ -11,3 +11,5 @@
 #include <TankServer.h>
 #include <BrickServer.h>
 #include <BulletServer.h>
+#include <fstream>
+#include <iosfwd>

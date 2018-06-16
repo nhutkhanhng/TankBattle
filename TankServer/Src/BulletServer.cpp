@@ -4,7 +4,7 @@
 BulletServer::BulletServer()
 {
 	//yarn lives a second...
-	mTimeToDie = Timing::sInstance.GetFrameStartTime() + 1.f;
+	mTimeToDie = Timing::sInstance.GetFrameStartTime() + 3.f;
 }
 
 void BulletServer::HandleDying()
@@ -24,15 +24,14 @@ void BulletServer::Update()
 
 }
 
-bool BulletServer::HandleCollisionWithTank( Tank* inCat )
+bool BulletServer::HandleCollisionWithTank( Tank* inTank )
 {
-	if( inCat->GetPlayerId() != GetPlayerId() )
+	if( inTank->GetPlayerId() != GetPlayerId() )
 	{
 		//kill yourself!
 		SetDoesWantToDie( true );
 
-		static_cast< TankServer* >( inCat )->TakeDamage( GetPlayerId() );
-
+		static_cast< TankServer* >( inTank )->TakeDamage( GetPlayerId() );
 	}
 
 	return false;

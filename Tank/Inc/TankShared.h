@@ -31,6 +31,8 @@
 #include <windows.h>
 #include <iostream>
 
+#include <fstream>
+
 #include "memory"
 
 #include "vector"

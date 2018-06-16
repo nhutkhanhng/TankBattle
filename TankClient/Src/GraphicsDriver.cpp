@@ -33,8 +33,7 @@ bool GraphicsDriver::Init( SDL_Window* inWnd )
 		return false;
 	}
 
-	// Cornflower blue background, cause why not?
-	SDL_SetRenderDrawColor( mRenderer, 100, 149, 237, SDL_ALPHA_OPAQUE );
+	SDL_SetRenderDrawColor( mRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE );
 	// Set the logical size to 1280x720 so everything will just auto-scale
 	SDL_RenderSetLogicalSize( mRenderer, 1280, 720 );
 	return true;

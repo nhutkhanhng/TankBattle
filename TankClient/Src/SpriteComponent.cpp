@@ -5,10 +5,8 @@ SpriteComponent::SpriteComponent( GameObject *inGameObject ) :
 {
 	//hardcoded at the moment...
 	float textureWidth = 128.f, textureHeight = 128.f;
-	//origin should be half texture size, but we're not loading the actual size at the moment
 	mOrigin = Vector3( textureWidth * 0.5f * 0.f, textureHeight * 0.5f * 0.f, 0.f );
 
-	//and add yourself to the rendermanager...
 	RenderManager::sInstance->AddComponent( this );
 }
 

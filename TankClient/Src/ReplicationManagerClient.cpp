@@ -34,8 +34,7 @@ void ReplicationManagerClient::ReadAndDoCreateAction( InputMemoryBitStream& inIn
 	uint32_t fourCCName;
 	inInputStream.Read( fourCCName );
 
-	//we might already have this object- could happen if our ack of the create got dropped so server resends create request 
-	//( even though we might have created )
+	//could happen if our ack of the create got dropped so server resends create request 
 	GameObjectPtr gameObject = NetworkManagerClient::sInstance->GetGameObject( inNetworkId );
 	if( !gameObject )
 	{
@@ -45,7 +44,6 @@ void ReplicationManagerClient::ReadAndDoCreateAction( InputMemoryBitStream& inIn
 		gameObject->SetNetworkId( inNetworkId );
 		NetworkManagerClient::sInstance->AddToNetworkIdToGameObjectMap( gameObject );
 		
-		//it had really be the rigth type...
 		assert( gameObject->GetClassId() == fourCCName );
 	}
 
@@ -58,15 +56,12 @@ void ReplicationManagerClient::ReadAndDoUpdateAction( InputMemoryBitStream& inIn
 	//need object
 	GameObjectPtr gameObject = NetworkManagerClient::sInstance->GetGameObject( inNetworkId );
 
-	//gameObject MUST be found, because create was ack'd if we're getting an update...
-	//and read state
 	gameObject->Read( inInputStream );
 }
 
 void ReplicationManagerClient::ReadAndDoDestroyAction( InputMemoryBitStream& inInputStream, int inNetworkId )
 {
-	//if something was destroyed before the create went through, we'll never get it
-	//but we might get the destroy request, so be tolerant of being asked to destroy something that wasn't created
+
 	GameObjectPtr gameObject = NetworkManagerClient::sInstance->GetGameObject( inNetworkId );
 	if( gameObject )
 	{

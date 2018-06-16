@@ -53,8 +53,6 @@ int UDPSocket::ReceiveFrom( void* inToReceive, int inMaxLength, SocketAddress& o
 		}
 		else if( error == WSAECONNRESET )
 		{
-			//this can happen if a client closed and we haven't DC'd yet.
-			//this is the ICMP message being sent back saying the port on that computer is closed
 			LOG( "Connection reset from %s", outFromAddress.ToString().c_str() );
 			return -WSAECONNRESET;
 		}

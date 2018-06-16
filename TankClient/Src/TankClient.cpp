@@ -87,7 +87,6 @@ void TankClient::Read(InputMemoryBitStream& inInputStream)
 		inInputStream.Read(replicatedLocation.mY);
 
 		SetLocation(replicatedLocation);
-
 		inInputStream.Read(replicatedRotation);
 		std::cout << "\nReadRotation from server" << replicatedRotation;
 		SetRotation(replicatedRotation);
@@ -125,7 +124,6 @@ void TankClient::Read(InputMemoryBitStream& inInputStream)
 
 	if (GetPlayerId() == NetworkManagerClient::sInstance->GetPlayerId())
 	{
-		//did we get health? if so, tell the hud!
 		if ((readState & ECRS_Health) != 0)
 		{
 			HUD::sInstance->SetPlayerHealth(mHealth);
@@ -133,7 +131,6 @@ void TankClient::Read(InputMemoryBitStream& inInputStream)
 
 		DoClientSidePredictionAfterReplicationForLocalTank(readState);
 
-		//if this is a create packet, don't interpolate
 		if ((readState & ECRS_PlayerId) == 0)
 		{
 			InterpolateClientSidePrediction(oldRotation, oldLocation, oldVelocity, false);
@@ -143,7 +140,7 @@ void TankClient::Read(InputMemoryBitStream& inInputStream)
 	{
 		DoClientSidePredictionAfterReplicationForRemoteTank(readState);
 
-		//will this smooth us out too? it'll interpolate us just 10% of the way there...
+
 		if ((readState & ECRS_PlayerId) == 0)
 		{
 			InterpolateClientSidePrediction(oldRotation, oldLocation, oldVelocity, true);
@@ -161,11 +158,6 @@ void TankClient::DoClientSidePredictionAfterReplicationForLocalTank(uint32_t inR
 {
 	if ((inReadState & ECRS_Pose) != 0)
 	{
-		//simulate pose only if we received new pose- might have just gotten thrustDir
-		//in which case we don't need to replay moves because we haven't warped backwards
-
-		//all processed moves have been removed, so all that are left are unprocessed moves
-		//so we must apply them...
 		const MoveList& moveList = InputManager::sInstance->GetMoveList();
 
 		for (const Move& move : moveList)
@@ -176,26 +168,15 @@ void TankClient::DoClientSidePredictionAfterReplicationForLocalTank(uint32_t inR
 			SimulateMovement(deltaTime);
 		}
 	}
-
-
-
 }
 
 
 void TankClient::InterpolateClientSidePrediction(float inOldRotation, const Vector3& inOldLocation, const Vector3& inOldVelocity, bool inIsForRemoteTank)
 {
-	if (inOldRotation != GetRotation() && !inIsForRemoteTank)
-	{
-		LOG("ERROR! Move replay ended with incorrect rotation!", 0);
-	}
-
 	float roundTripTime = NetworkManagerClient::sInstance->GetRoundTripTime();
 
 	if (!TMath::Is2DVectorEqual(inOldLocation, GetLocation()))
 	{
-		//LOG( "ERROR! Move replay ended with incorrect location!", 0 );
-
-		//have we been out of sync, or did we just become out of sync?
 		float time = Timing::sInstance.GetFrameStartTime();
 		if (mTimeLocationBecameOutOfSync == 0.f)
 		{
@@ -210,30 +191,24 @@ void TankClient::InterpolateClientSidePrediction(float inOldRotation, const Vect
 	}
 	else
 	{
-		//we're in sync
+		//sync
 		mTimeLocationBecameOutOfSync = 0.f;
 	}
 
 
 	if (!TMath::Is2DVectorEqual(inOldVelocity, GetVelocity()))
 	{
-		//LOG( "ERROR! Move replay ended with incorrect velocity!", 0 );
-
-		//have we been out of sync, or did we just become out of sync?
 		float time = Timing::sInstance.GetFrameStartTime();
 		if (mTimeVelocityBecameOutOfSync == 0.f)
 		{
 			mTimeVelocityBecameOutOfSync = time;
 		}
 
-		//now interpolate to the correct value...
 		float durationOutOfSync = time - mTimeVelocityBecameOutOfSync;
 		if (durationOutOfSync < roundTripTime)
 		{
 			SetVelocity(Lerp(inOldVelocity, GetVelocity(), inIsForRemoteTank ? (durationOutOfSync / roundTripTime) : 0.1f));
 		}
-		//otherwise, fine...
-
 	}
 	else
 	{
@@ -243,18 +218,14 @@ void TankClient::InterpolateClientSidePrediction(float inOldRotation, const Vect
 
 }
 
-
-//so what do we want to do here? need to do some kind of interpolation...
 void TankClient::DoClientSidePredictionAfterReplicationForRemoteTank(uint32_t inReadState)
 {
 	if ((inReadState & ECRS_Pose) != 0)
 	{
-
-		//simulate movement for an additional RTT
 		float rtt = NetworkManagerClient::sInstance->GetRoundTripTime();
-		//LOG( "Other cat came in, simulating for an extra %f", rtt );
+		
 
-		//let's break into framerate sized chunks though so that we don't run through walls and do crazy things...
+		// Crazy time ==]]]
 		float deltaTime = 1.f / 30.f;
 
 		while (true)

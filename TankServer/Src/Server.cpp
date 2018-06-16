@@ -1,9 +1,8 @@
 
 #include <TankServerPCH.h>
 
-
-
-//uncomment this when you begin working on the server
+const float HALF_WORLD_HEIGHT = 3.6f;
+const float HALF_WORLD_WIDTH = 6.4f;
 
 bool Server::StaticInit()
 {
@@ -15,9 +14,9 @@ bool Server::StaticInit()
 Server::Server()
 {
 
-	GameObjectRegistry::sInstance->RegisterCreationFunction( 'RCAT', TankServer::StaticCreate );
-	GameObjectRegistry::sInstance->RegisterCreationFunction( 'MOUS', BrickServer::StaticCreate );
-	GameObjectRegistry::sInstance->RegisterCreationFunction( 'YARN', BulletServer::StaticCreate );
+	GameObjectRegistry::sInstance->RegisterCreationFunction( 'TANK', TankServer::StaticCreate );
+	GameObjectRegistry::sInstance->RegisterCreationFunction( 'BRIK', BrickServer::StaticCreate );
+	GameObjectRegistry::sInstance->RegisterCreationFunction( 'BULT', BulletServer::StaticCreate );
 
 	InitNetworkManager();
 	
@@ -48,32 +47,80 @@ bool Server::InitNetworkManager()
 namespace
 {
 	
-	void CreateRandomMice( int inMouseCount )
+	void CreateMap()
 	{
-		Vector3 mouseMin( -5.f, -3.f, 0.f );
-		Vector3 mouseMax( 5.f, 3.f, 0.f );
 		GameObjectPtr go;
+		Vector3 Location;
 
-		//make a mouse somewhere- where will these come from?
-		for( int i = 0; i < inMouseCount; ++i )
+		int row = 10;
+		int column = 15;
+
+
+		int count = 0;
+		for (int i = 1; i <= row; i++)
 		{
-			go = GameObjectRegistry::sInstance->CreateGameObject( 'MOUS' );
-			Vector3 mouseLocation = TMath::GetRandomVector( mouseMin, mouseMax );
-			go->SetLocation( mouseLocation );
+			for (int j = 1; j <= column; j++)
+			{		
+				if (i % 4 == 0 && j % 3 != 0)
+				{
+					if (count > 20)
+						return;
+
+					go = GameObjectRegistry::sInstance->CreateGameObject('BRIK');
+					Location.mY = -HALF_WORLD_HEIGHT + 0.64f * (i + 1) - 0.32;
+					Location.mX = -HALF_WORLD_WIDTH + 0.64f * (j + 1) - 0.32;
+
+					go->SetLocation(Location);
+
+					count++;
+				}
+			}
 		}
+		
+
 	}
 
+	void CreateRowBrick()
+	{
+		GameObjectPtr go;
 
+		float i = -HALF_WORLD_WIDTH + 0.64;
+
+		while (i <= HALF_WORLD_WIDTH - 0.96)
+		{
+			go = GameObjectRegistry::sInstance->CreateGameObject('BRIK');
+			/*Vector3 Location = TMath::GetRandomVector( MinLocation, MaxLocation );*/
+			Vector3 Location;
+
+			Location.mX = i + 0.32f;
+			Location.mY = -HALF_WORLD_HEIGHT + 0.32f;
+
+
+			go->SetLocation(Location);
+
+			go = GameObjectRegistry::sInstance->CreateGameObject('BRIK');
+			Location.mY = HALF_WORLD_HEIGHT - 0.32f;
+			go->SetLocation(Location);
+
+			i += 0.64f;
+			
+		}	
+	}
 }
 
 
 void Server::SetupWorld()
 {
 	//spawn some random mice
-	CreateRandomMice( 10 );
-	
-	//spawn more random mice!
-	CreateRandomMice( 10 );
+	CreateMap();
+	/*CreateColumnBrick();*/
+
+
+
+	/*CreateBrick(10, false);*/
+	//
+	////spawn more random mice!
+	//CreateRandomMice( 10 );
 }
 
 void Server::DoFrame()
@@ -101,7 +148,7 @@ void Server::HandleNewClient( ClientProxyPtr inClientProxy )
 
 void Server::SpawnCatForPlayer( int inPlayerId )
 {
-	TankPtr tank = std::static_pointer_cast< Tank >( GameObjectRegistry::sInstance->CreateGameObject( 'RCAT' ) );
+	TankPtr tank = std::static_pointer_cast< Tank >( GameObjectRegistry::sInstance->CreateGameObject( 'TANK' ) );
 	tank->SetColor( ScoreBoardManager::sInstance->GetEntry( inPlayerId )->GetColor() );
 	tank->SetPlayerId( inPlayerId );
 	//gotta pick a better spawn location than this...
@@ -125,10 +172,7 @@ void Server::HandleLostClient( ClientProxyPtr inClientProxy )
 
 TankPtr Server::GetTankForPlayer( int inPlayerId )
 {
-	//run through the objects till we find the cat...
-	//it would be nice if we kept a pointer to the cat on the clientproxy
-	//but then we'd have to clean it up when the cat died, etc.
-	//this will work for now until it's a perf issue
+
 	const auto& gameObjects = World::sInstance->GetGameObjects();
 	for( int i = 0, c = gameObjects.size(); i < c; ++i )
 	{

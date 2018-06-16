@@ -50,10 +50,9 @@ void BulletClient::Read( InputMemoryBitStream& inInputStream )
 
 }
 
-//you look like you hit a cat on the client, so disappear ( whether server registered or not
-bool BulletClient::HandleCollisionWithTank( Tank* inCat )
+bool BulletClient::HandleCollisionWithTank( Tank* inTank )
 {
-	if( GetPlayerId() != inCat->GetPlayerId() )
+	if( GetPlayerId() != inTank->GetPlayerId() )
 	{
 		RenderManager::sInstance->RemoveComponent( mSpriteComponent.get() );
 	}

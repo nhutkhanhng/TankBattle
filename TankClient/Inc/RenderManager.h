@@ -1,5 +1,3 @@
-//I take care of rendering things!
-
 class RenderManager
 {
 public:

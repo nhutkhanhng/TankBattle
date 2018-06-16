@@ -30,43 +30,35 @@ public:
 	void	SetScale(float inScale) { mScale = inScale; }
 	float	GetScale()						const { return mScale; }
 
-
 	const Vector3&		GetLocation()				const { return mLocation; }
 	void		SetLocation(const Vector3& inLocation) { mLocation = inLocation; }
-
 	float		GetCollisionRadius()		const { return mCollisionRadius; }
 	void		SetCollisionRadius(float inRadius) { mCollisionRadius = inRadius; }
-
 	Vector3		GetForwardVector()			const;
-
 	void		SetColor(const Vector3& inColor) { mColor = inColor; }
 	const Vector3&		GetColor()					const { return mColor; }
-
 	bool		DoesWantToDie()				const { return mDoesWantToDie; }
 	void		SetDoesWantToDie(bool inWants) { mDoesWantToDie = inWants; }
-
 	int			GetNetworkId()				const { return mNetworkId; }
 	void		SetNetworkId(int inNetworkId);
-
 	virtual uint32_t	Write(OutputMemoryBitStream& inOutputStream, uint32_t inDirtyState) const { (void)inOutputStream; (void)inDirtyState; return 0; }
 	virtual void		Read(InputMemoryBitStream& inInputStream) { (void)inInputStream; }
 
+
 private:
+	Vector3	mLocation;
+	Vector3	mColor;
+
+	float	mCollisionRadius;
 
 
-	Vector3											mLocation;
-	Vector3											mColor;
+	float mRotation;
+	float mScale;
+	int	mIndexInWorld;
 
-	float											mCollisionRadius;
+	bool	mDoesWantToDie;
 
-
-	float											mRotation;
-	float											mScale;
-	int												mIndexInWorld;
-
-	bool											mDoesWantToDie;
-
-	int												mNetworkId;
+	int		mNetworkId;
 
 };
 

@@ -2,8 +2,6 @@
 class InputState
 {
 public:
-
-
 	InputState() :
 	mDesiredRightAmount( 0 ),
 	mDesiredLeftAmount( 0 ),

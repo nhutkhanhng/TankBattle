@@ -1,11 +1,10 @@
 
 #include <TankClientPCH.h>
 
-#if _WIN32
-int WINAPI WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow )
+int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
-	UNREFERENCED_PARAMETER( hPrevInstance );
-	UNREFERENCED_PARAMETER( lpCmdLine );
+	UNREFERENCED_PARAMETER(hPrevInstance);
+	UNREFERENCED_PARAMETER(lpCmdLine);
 
 	AllocConsole();
 
@@ -24,7 +23,7 @@ int WINAPI WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
 
 
-	if( Client::StaticInit() )
+	if (Client::StaticInit())
 	{
 		std::cout << "Initializing";
 		return Client::sInstance->Run();
@@ -35,26 +34,5 @@ int WINAPI WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		//error
 		return 1;
 	}
-	
-}
-#else
-const char** __argv;
-int __argc;
-int main(int argc, const char** argv)
-{
-	__argc = argc;
-	__argv = argv;
-	
-	if( Client::StaticInit() )
-	{
-		return Client::sInstance->Run();
-	}
-	else
-	{
-		SDL_Quit();
-		//error
-		return 1;
-	}
-}
-#endif
 
+}

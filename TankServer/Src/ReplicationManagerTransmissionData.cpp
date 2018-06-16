@@ -2,22 +2,13 @@
 
 void ReplicationManagerTransmissionData::AddTransmission( int inNetworkId, ReplicationAction inAction, uint32_t inState )
 {
-	/*
-	//it would be silly if we already had a transmission for this network id in here...
-	for( const auto& transmission: mTransmissions )
-	{
-		assert( inNetworkId != transmission.GetNetworkId() );
-	}
-	*/
 	mTransmissions.emplace_back( inNetworkId, inAction, inState );
 }
 
 void ReplicationManagerTransmissionData::HandleDeliveryFailure( DeliveryNotificationManager* inDeliveryNotificationManager ) const
 {
-	//run through the transmissions
 	for( const ReplicationTransmission& rt: mTransmissions )
 	{
-		//is it a create? then we have to redo the create.
 		int networkId = rt.GetNetworkId();
 
 		switch( rt.GetAction() )
@@ -38,7 +29,6 @@ void ReplicationManagerTransmissionData::HandleDeliveryFailure( DeliveryNotifica
 
 void ReplicationManagerTransmissionData::HandleDeliverySuccess( DeliveryNotificationManager* inDeliveryNotificationManager ) const
 {
-	//run through the transmissions, if any are Destroyed then we can remove this network id from the map
 	for( const ReplicationTransmission& rt: mTransmissions )
 	{
 		switch( rt.GetAction() )
@@ -58,7 +48,6 @@ void ReplicationManagerTransmissionData::HandleDeliverySuccess( DeliveryNotifica
 
 void ReplicationManagerTransmissionData::HandleCreateDeliveryFailure( int inNetworkId ) const
 {
-	//does the object still exist? it might be dead, in which case we don't resend a create
 	GameObjectPtr gameObject = NetworkManagerServer::sInstance->GetGameObject( inNetworkId );
 	if( gameObject )
 	{
@@ -76,8 +65,6 @@ void ReplicationManagerTransmissionData::HandleUpdateStateDeliveryFailure( int i
 	//does the object still exist? it might be dead, in which case we don't resend an update
 	if( NetworkManagerServer::sInstance->GetGameObject( inNetworkId ) )
 	{
-		//look in all future in flight packets, in all transmissions
-		//remove written state from dirty state
 		for( const auto& inFlightPacket: inDeliveryNotificationManager->GetInFlightPackets() )
 		{
 			ReplicationManagerTransmissionDataPtr rmtdp = std::static_pointer_cast< ReplicationManagerTransmissionData >( inFlightPacket.GetTransmissionData( 'RPLM' ) );
@@ -88,7 +75,6 @@ void ReplicationManagerTransmissionData::HandleUpdateStateDeliveryFailure( int i
 			}
 		}
 		
-		//if there's still any dirty state, mark it
 		if( inState )
 		{
 			mReplicationManagerServer->SetStateDirty( inNetworkId, inState );

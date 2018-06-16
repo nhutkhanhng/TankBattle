@@ -22,7 +22,7 @@ void ClientProxy::UpdateLastPacketTime()
 	mLastPacketFromClientTime = Timing::sInstance.GetTimef(); 
 }
 
-void	ClientProxy::HandleCatDied()
+void	ClientProxy::HandleTankDied()
 {
 	mTimeToRespawn = Timing::sInstance.GetFrameStartTime() + kRespawnDelay;
 }

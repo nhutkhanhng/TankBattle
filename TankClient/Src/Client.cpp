@@ -3,7 +3,6 @@
 
 bool Client::StaticInit( )
 {
-	// Create the Client pointer first because it initializes SDL
 	Client* client = new Client();
 
 	if( WindowManager::StaticInit() == false )
@@ -40,10 +39,10 @@ Client::Client()
 
 	NetworkManagerClient::StaticInit( *serverAddress, name );
 
-	//NetworkManagerClient::sInstance->SetDropPacketChance( 0.6f );
+	/*NetworkManagerClient::sInstance->SetDropPacketChance( 0.6f );*/
 	//NetworkManagerClient::sInstance->SetSimulatedLatency( 0.25f );
 	//NetworkManagerClient::sInstance->SetSimulatedLatency( 0.5f );
-	//NetworkManagerClient::sInstance->SetSimulatedLatency( 0.1f );
+	/*NetworkManagerClient::sInstance->SetSimulatedLatency( 0.1f );*/
 }
 
 

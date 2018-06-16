@@ -1,9 +1,8 @@
 #include <TankPCH.h>
 
-//zoom hardcoded at 100...if we want to lock players on screen, this could be calculated from zoom
-const float HALF_WORLD_HEIGHT = 3.6f;
-const float HALF_WORLD_WIDTH = 6.4f;
-
+// Lock Zomm = 100
+const float HALF_WORLD_HEIGHT = 3.6 - 0.64f;
+const float HALF_WORLD_WIDTH = 6.4 - 0.68f;
 Tank::Tank() :
 	GameObject(),
 	mMaxRotationSpeed( 5.f ),
@@ -16,7 +15,7 @@ Tank::Tank() :
 	mIsShooting( false ),
 	mHealth( 10 )
 {
-	SetCollisionRadius( 0.3 );
+	SetCollisionRadius( 0.3f );
 }
 
 namespace {
@@ -87,7 +86,7 @@ void Tank::Update()
 	
 }
 
-namespace {
+namespace Collision {
 	bool CollideBox(const GameObject& A, const GameObject& B)
 	{
 		if ((A.GetLocation().mX + A.GetCollisionRadius() >= B.GetLocation().mX - B.GetCollisionRadius()) &&
@@ -112,7 +111,6 @@ namespace {
 }
 void Tank::ProcessCollisions()
 {
-	//right now just bounce off the sides..
 	ProcessCollisionsWithScreenWalls();
 
 	float sourceRadius = GetCollisionRadius();
@@ -144,14 +142,14 @@ void Tank::ProcessCollisions()
 
 			float CUV = Dot2D(delta,Vdiff);
 
-			if (CollideBox(*this, *target))
+			if (Collision::CollideBox(*this, *target))
 			{
 				if (target->HandleCollisionWithTank(this))
 				{
 
 					Vector3 dirToTarget = delta;
 
-					dirToTarget.Normalize2D();
+					/*dirToTarget.Normalize2D();*/
 
 					
 
@@ -170,7 +168,7 @@ void Tank::ProcessCollisions()
 					else
 						acceptableDeltaFromSourceToTarget = dirToTarget * collisionDist;*/
 
-					acceptableDeltaFromSourceToTarget = dirToTarget * collisionDist;
+					acceptableDeltaFromSourceToTarget = dirToTarget /** collisionDist*/;
 
 					std::cout << "\nDirToTarget" << acceptableDeltaFromSourceToTarget;
 
@@ -191,7 +189,7 @@ void Tank::ProcessCollisions()
 					float CUV = Dot2D(sourceLocation, targetLocation);
 
 					std::cout << " Position " << GetLocation();
-					SetLocation(sourceLocation - acceptableDeltaFromSourceToTarget * ( 0.1f )/** (collisionDist * distSq)*/ /* - sourceLocation*/);
+					SetLocation(sourceLocation - acceptableDeltaFromSourceToTarget * mTankRestitution/** (collisionDist * distSq)*/ /* - sourceLocation*/);
 					std::cout << " Position " << GetLocation();
 
 					Vector3 relVel = mVelocity;
@@ -225,50 +223,6 @@ void Tank::ProcessCollisions()
 					//Vdiff = Vdiff * (1 / acceptableDeltaFromSourceToTarget.Length2D());
 				}
 			}
-
-		/*	if( distSq < ( collisionDist * collisionDist ) )
-			{*/
-				//if (target->HandleCollisionWithTank(this))
-				//{
-
-				//	Vector3 dirToTarget = delta;
-				//	dirToTarget.Normalize2D();
-
-				//	Vector3 acceptableDeltaFromSourceToTarget = dirToTarget * collisionDist;
-
-				//	SetLocation(targetLocation - acceptableDeltaFromSourceToTarget);
-
-
-				//	Vector3 relVel = mVelocity;
-
-				//	//if other object is a cat, it might have velocity, so there might be relative velocity...
-				//	Tank* targetTank = target->GetAsTank();
-				//	if (targetTank)
-				//	{
-				//		std::cout << "delta : " << delta;
-				//		relVel -= targetTank->mVelocity;
-				//	}
-
-				//	float relVelDotDir = Dot2D(relVel, dirToTarget);
-
-				//	if (relVelDotDir > 0.f)
-				//	{
-				//		Vector3 impulse = relVelDotDir * dirToTarget;
-
-				//		if (targetTank)
-				//		{
-				//			mVelocity -= impulse;
-				//			mVelocity *= mTankRestitution;
-				//		}
-				//		else
-				//		{
-				//			mVelocity -= impulse * 2.f;
-				//			mVelocity *= mWallRestitution;
-				//		}
-
-				//	}
-				//}
-			/*}*/
 		}
 	}
 
@@ -291,10 +245,10 @@ void Tank::ProcessCollisionsWithScreenWalls()
 		location.mY = HALF_WORLD_HEIGHT - radius;
 		SetLocation( location );
 	}
-	else if( y <= ( -HALF_WORLD_HEIGHT - radius ) && vy < 0 )
+	else if( y <= ( -HALF_WORLD_HEIGHT + radius ) && vy < 0 )
 	{
 		mVelocity.mY = -vy * mWallRestitution;
-		location.mY = -HALF_WORLD_HEIGHT - radius;
+		location.mY = -HALF_WORLD_HEIGHT + radius;
 		SetLocation( location );
 	}
 
@@ -304,10 +258,10 @@ void Tank::ProcessCollisionsWithScreenWalls()
 		location.mX = HALF_WORLD_WIDTH - radius;
 		SetLocation( location );
 	}
-	else if(  x <= ( -HALF_WORLD_WIDTH - radius ) && vx < 0 )
+	else if(  x <= ( -HALF_WORLD_WIDTH + radius ) && vx < 0 )
 	{
 		mVelocity.mX = -vx * mWallRestitution;
-		location.mX = -HALF_WORLD_WIDTH - radius;
+		location.mX = -HALF_WORLD_WIDTH + radius;
 		SetLocation( location );
 	}
 }
@@ -385,10 +339,6 @@ uint32_t Tank::Write( OutputMemoryBitStream& inOutputStream, uint32_t inDirtySta
 	{
 		inOutputStream.Write( (bool)false );
 	}
-
-
-	
-
 
 	
 
