@@ -101,8 +101,6 @@ bool DeliveryNotificationManager::ProcessSequenceNumber( InputMemoryBitStream& i
 }
 
 
-//in each packet we can ack a range
-//anything in flight before the range will be considered nackd by the other side immediately
 void DeliveryNotificationManager::ProcessAcks( InputMemoryBitStream& inInputStream )
 {
 

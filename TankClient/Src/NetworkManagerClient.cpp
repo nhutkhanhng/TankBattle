@@ -106,12 +106,8 @@ void NetworkManagerClient::HandleStatePacket( InputMemoryBitStream& inInputStrea
 	if( mState == NCS_Welcomed )
 	{
 		ReadLastMoveProcessedOnServerTimestamp( inInputStream );
-
 		//old
-		//HandleGameObjectState( inPacketBuffer );
 		HandleScoreBoardState( inInputStream );
-
-		//tell the replication manager to handle the rest...
 		mReplicationManagerClient.Read( inInputStream );
 	}
 }
@@ -135,11 +131,11 @@ void NetworkManagerClient::ReadLastMoveProcessedOnServerTimestamp( InputMemoryBi
 
 void NetworkManagerClient::HandleGameObjectState( InputMemoryBitStream& inInputStream )
 {
-	//copy the mNetworkIdToGameObjectMap so that anything that doesn't get an updated can be destroyed...
 	IntToGameObjectMap	objectsToDestroy = mNetworkIdToGameObjectMap;
 
 	int stateCount;
 	inInputStream.Read( stateCount );
+
 	if( stateCount > 0 )
 	{
 		for( int stateIndex = 0; stateIndex < stateCount; ++stateIndex )
@@ -151,7 +147,7 @@ void NetworkManagerClient::HandleGameObjectState( InputMemoryBitStream& inInputS
 			inInputStream.Read( fourCC );
 			GameObjectPtr go;
 			auto itGO = mNetworkIdToGameObjectMap.find( networkId );
-			//didn't find it, better create it!
+
 			if( itGO == mNetworkIdToGameObjectMap.end() )
 			{
 				go = GameObjectRegistry::sInstance->CreateGameObject( fourCC );
@@ -170,7 +166,6 @@ void NetworkManagerClient::HandleGameObjectState( InputMemoryBitStream& inInputS
 		}
 	}
 
-	//anything left gets the axe
 	DestroyGameObjectsInMap( objectsToDestroy );
 }
 
